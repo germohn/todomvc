@@ -3,19 +3,38 @@ import React, { Component } from 'react';
 class ToDoListInput extends Component{
   constructor(props){
     super(props);
+
     this.state = {
-      taskName: ""
+      taskName: "",
+      done: false
     };
+
     this.onSubmit = this.onSubmit.bind(this);
+    this.handleTaskNameChange = this.handleTaskNameChange.bind(this);
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
   }
+
   handleTaskNameChange(event) {
     this.setState({taskName: event.target.value});
   }
+
+  handleCheckboxChange(event){
+   // debugger;
+    this.setState({done: event.target.checked});
+  }
+
   onSubmit(event){
     event.preventDefault();
-    this.props.onSubmit(this.state.taskName);
-    this.setState({item: ''});
-
+ //  debugger;
+    this.props.onSubmit({
+      taskName: this.state.taskName, 
+      done:this.state.done
+    });
+    this.setState(
+      {taskName: ''
+      
+      }
+    );
     return;
   }  
   render(){
@@ -26,7 +45,13 @@ class ToDoListInput extends Component{
             type="text"
             placeholder="enter task"
             value={this.state.taskName}
-            onChange= {this.handleTaskNameChange.bind(this)}
+            onChange= {this.handleTaskNameChange}
+          />
+          <lable>done?</lable>
+          <input 
+          type = "checkbox"
+          value = {this.state.done}
+          onChange = {this.handleCheckboxChange}
           />
           <input type="submit" value="add"/>
         </form>
@@ -35,20 +60,34 @@ class ToDoListInput extends Component{
   }
 }
 
-class ToDoTask extends Component{
-  render(){
-    return(
-      <li>{this.props.children}</li>)
-  }
+const ToDoTask = (props) =>{
+  var name = props.done ?
+  props.taskName : 
+  <span style ={{color: "red"}}>
+  {props.taskName}
+  </span>
+  console.log(props.taskName);
+  console.log(props.done);
+  return(
+    <li>{name}</li>
+    );
 }
 
-const ToDoList = (props) => {
-  const taskElements = props.tasks.map((task) => {
-    return(<ToDoTask key={task.id}>
-      {task.taskName}
+
+
+const ToDoList = ({tasks}) => {
+
+  const taskElements = tasks.map((task) => {
+   // console.log(task.done);
+    return(
+    
+      <ToDoTask taskName = {task.taskName} 
+          done = {task.done} 
+          key={task.id}>
       </ToDoTask>
       );
   });
+
   return(
     <ul>{taskElements}</ul>
     );
@@ -60,15 +99,22 @@ class App extends Component {
     super(props);
     this.state = {
       tasks: [
-        {taskName: "test", id:1},
-        {taskName: "test2", id:2}
+        {taskName: "test", done: true , id:1},
+        {taskName: "test2", done: true , id:2},
+        {taskName: "test2", done: false , id:3}
       ]
     };
+
+    this.handleTaskSubmit = this.handleTaskSubmit.bind(this);
   }
-  handleTaskSubmit(taskName){
+  handleTaskSubmit(task) {
     const lastTask = this.state.tasks[this.state.tasks.length -1];
+    debugger;
     this.setState({
-      tasks: this.state.tasks.concat({taskName, id:lastTask.id +1})
+      tasks: this.state.tasks.concat({
+        taskName: task.taskName, 
+        done: task.done, 
+        id:lastTask.id +1})
     });
   }
 
@@ -76,7 +122,7 @@ class App extends Component {
     return(
       <div>
         <h1>ToDo Tasks</h1>
-        <ToDoListInput onSubmit={this.handleTaskSubmit.bind(this)} />
+        <ToDoListInput onSubmit={this.handleTaskSubmit} />
         <ToDoList tasks={this.state.tasks} />
       </div>
       );
