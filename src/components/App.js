@@ -6,24 +6,24 @@ class ToDoListInput extends Component{
     this.state = {
       taskName: ""
     };
+    this.onSubmit = this.onSubmit.bind(this);
   }
   handleTaskNameChange(event) {
-    this.setState(taskName: event.target.value);
+    this.setState({taskName: event.target.value});
   }
   onSubmit(event){
     event.preventDefault();
     this.props.onSubmit(this.state.taskName);
     this.setState({item: ''});
-    React.findDOMNode(this.refs.taskName).focus();
+
     return;
   }  
   render(){
     return(
-      <div className="todoListMain">
+      <div>
         <form onSubmit={this.onSubmit}>
           <input
             type="text"
-            ref="task"
             placeholder="enter task"
             value={this.state.taskName}
             onChange= {this.handleTaskNameChange.bind(this)}
